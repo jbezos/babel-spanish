@@ -1,7 +1,7 @@
 % \iffalse meta-comment
 %
-% Copyright (C) 1997 - 2016
-%        Javier Bezos (www.tex-tipografia.com)
+% Copyright (C) 1997 - 2021
+%        Javier Bezos (www.texnia.com)
 %     and
 %        CervanTeX (www.cervantex.es)
 %
@@ -23,7 +23,7 @@
 % \fi
 %
 % \ProvidesFile{spanish.dtx}
-%       [2016/03/03 v5.0p Spanish support from the babel system]
+%       [2021/05/27 v5.0q Spanish support from the babel system]
 %\iffalse
 %% File `spanish.dtx'
 %
@@ -118,17 +118,18 @@
 
 \title{Estilo \textsf{spanish}\\
 para el sistema \babel.\footnote{Este archivo está actualmente
-en la versión 5.0p con fecha 3 de marzo del 2016.
+en la versión 5.0q con fecha 3 de mayo del 2021.
 Esta copia del manual se compuso el~\today.}}
 
 \author{Javier Bezos\footnote{Por favor, envíen comentarios y
-sugerencias en http://www.tex-tipografia.com/spanish.html.  Han
-colaborado de una u otra forma muchas personas, a las cuales agradezco
-sus comentarios y sugerencias; en particular, han sido muy activos
-Juan Luis Varona y José Luis Rivera. Para información sobre
-actualizaciones: http://www.cervantex.es/}}
+sugerencias en http://www.texnia.com/spanish.html, donde se puede
+encontrar más información sobre este estilo, cómo usarlo y las
+decisiones tomadas. Han colaborado de una u otra forma muchas personas,
+a las cuales agradezco sus comentarios y sugerencias; en particular,
+han sido muy activos Juan Luis Varona y José Luis Rivera. Para errores:
+https://github.com/jbezos/babel-spanish.}}
 
-\date{3 de marzo del 2016}
+\date{27 de mayo del 2021}
 
 \maketitle
 
@@ -1266,7 +1267,7 @@ Trigg, Madrid, Alianza, 1987, t.~2, págs.~1423~-1451.
 \section{The Spanish language}
 
 The file \file{spanish.dtx}\footnote{The file described in this
-section has version number 5.0p and was last revised on 2016-03-03.
+section has version number 5.0q and was last revised on 2021-05-27.
 The maintainer from v4.0 on is Javier Bezos
 (http://www.tex-tipografia.com).  Previous versions were made by Julio
 S\'anchez.  The English documentation has been improved by José Luis
@@ -1556,7 +1557,7 @@ previous behavior and macros for backwards compatibility.
 % \changes{spanish~5.0n}{2014/01/30}{\cs{es@accent} -- Removed first
 %   \cs{bbl@allowhyphens}, the second one is ignored if a space
 %   follows, removed code for spacefactor, removed code for primes}
-% \changes{spanish~5.0n}{2014/04/14}{Check font name in \cs{dotlessi}}}
+% \changes{spanish~5.0n}{2014/04/14}{Check font name in \cs{dotlessi}}
 % \changes{spanish~5.0n}{2014/04/23}{Added \cs{spanishdate} and
 %   \cs{spanishDate}}
 % \changes{spanish~5.0o}{2016/01/14}{Added \cs{spanishdate} and
@@ -1567,7 +1568,7 @@ previous behavior and macros for backwards compatibility.
 %    \begin{macrocode}
 %<*code>
 \ProvidesLanguage{spanish.ldf}
-    [2016/03/03 v5.0p Spanish support from the babel system]
+    [2021/05/27 v5.0q Spanish support from the babel system]
 \LdfInit{spanish}\captionsspanish
 
 \edef\es@savedcatcodes{%
@@ -1929,7 +1930,14 @@ previous behavior and macros for backwards compatibility.
   \let\es@save@dot\.%
   \es@sDRC\.{\@ifnextchar.{\es@dots}{\es@save@dot}}}
 \def\es@dots..{\leavevmode\hbox{...}\spacefactor\@M}
-\def\es@sppercent{\unskip\textormath{$\m@th\,$}{\,}}
+\AtBeginDocument{% TODO. Not quite correct.
+  \ifx\pdfstringdefDisableCommands\@undefined\else
+    \pdfstringdefDisableCommands{\let\.\es@save@dot}%
+  \fi}
+\def\es@sppercent{% See tex.stack 435216 @egreg
+  \leavevmode
+  \ifnum\gluestretchorder\lastskip=\z@\unskip\fi
+  \textormath{$\m@th\,$}{\,}}
 \def\spanishplainpercent{\let\es@sppercent\@empty}
 \addto\textspanish{%
   \let\percentsign\%%
@@ -1957,20 +1965,22 @@ previous behavior and macros for backwards compatibility.
 \fi
 
 \def\es@fetchenc{%
-  \count@\escapechar \escapechar=\m@ne
-    \edef\es@a{\expandafter\string\the\textfont\mathgroup}%
-    \expandafter\split@name\es@a////\@nil
-  \escapechar=\count@
-  \@expandtwoargs\in@{////}{\f@size}%
-  \ifin@\else
-    \PackageError{spanish}{%
-      Non-NFSS font name. The current math font (\es@a)\MessageBreak
-      doesn't follow the NFSS conventions. I'll use the\MessageBreak
-      default \string\i\space for \string\dotlessi,
-      but expect a wrong output.}%
-    {Find where this font has been (re)defined, and fix it.}%
-    \def\f@encoding{OT1}%
-  \fi}
+  \begingroup
+    \count@\escapechar \escapechar=\m@ne
+      \edef\es@a{\expandafter\string\the\textfont\mathgroup}%
+      \expandafter\split@name\es@a////\@nil
+    \escapechar=\count@
+    \@expandtwoargs\in@{////}{\f@size}%
+    \ifin@\else
+      \PackageError{spanish}{%
+        Non-NFSS font name. The current math font (\es@a)\MessageBreak
+        doesn't follow the NFSS conventions. I'll use the\MessageBreak
+        default \string\i\space for \string\dotlessi,
+        but expect a wrong output.}%
+      {Find where this font has been (re)defined, and fix it.}%
+      \def\f@encoding{OT1}%
+    \fi
+  \bbl@exp{\endgroup\def\\\f@encoding{\f@encoding}}}
 
 \ifes@latex
   \ifx\Umathchardef\@undefined\else
@@ -2237,6 +2247,8 @@ previous behavior and macros for backwards compatibility.
   \es@sdef\'#1{\if#1i\es@accent\'{19}\i\else\es@accent\'{19}{#1}\fi}}
 \fi
 
+\def\es@babeltexpdf#1#2{\babel@texpdf{#1}{#2}{#2}{}}
+
 \def\es@sptext@r#1#2{\es@sptext{#1#2}}
 \es@declare{"a}{\sptext{a}}
 \es@declare{"A}{\sptext{A}}
@@ -2254,11 +2266,11 @@ previous behavior and macros for backwards compatibility.
 \es@declare{">}{\guillemotright{}}
 \def\es@chf{\char\hyphenchar\font}
 \es@declare{"-}{\bbl@allowhyphens\-\bbl@allowhyphens}
-\es@declare{"=}{\bbl@allowhyphens\es@chf\hskip\z@skip}
+\es@declare{"=}{\es@babeltexpdf{\bbl@allowhyphens\es@chf\hskip\z@skip}{-}}
 \es@declare{"~}
-  {\bbl@allowhyphens
+  {\es@babeltexpdf{\bbl@allowhyphens
    \discretionary{\es@chf}{\es@chf}{\es@chf}%
-   \bbl@allowhyphens}
+   \bbl@allowhyphens}{-}}
 \es@declare{"r}
   {\bbl@allowhyphens
    \discretionary{\es@chf}{}{r}%
@@ -2285,16 +2297,18 @@ previous behavior and macros for backwards compatibility.
      \box\z@
    \fi}
 \es@declare{"?}
-  {\setbox\z@\hbox{?`}%
-   \leavevmode\raise\dp\z@\box\z@}
+  {\es@babeltexpdf{\setbox\z@\hbox{?`}%
+   \leavevmode\raise\dp\z@\box\z@}{\textquestiondown}}
 \es@declare{"!}
-  {\setbox\z@\hbox{!`}%
-   \leavevmode\raise\dp\z@\box\z@}
+  {\es@babeltexpdf{\setbox\z@\hbox{!`}%
+   \leavevmode\raise\dp\z@\box\z@}{\textexclamdown}}
 
 \def\spanishdecimal#1{\def\es@decimal{{#1}}}
 \def\decimalcomma{\spanishdecimal{,}}
 \def\decimalpoint{\spanishdecimal{.}}
 \decimalcomma
+\bbl@ifshorthand{.}{}%
+  {\PassOptionsToPackage{es-nodecimaldot}{babel}}
 \es@ifoption{nodecimaldot}{}
   {\AtBeginDocument{\bgroup\@fileswfalse}%
    \begingroup\lccode`\~=`\.\lowercase{\endgroup
@@ -2322,6 +2336,8 @@ previous behavior and macros for backwards compatibility.
    \def\es@a#1{\es@declare{.#1}{\es@decimal#1}}%
    \es@a1\es@a2\es@a3\es@a4\es@a5\es@a6\es@a7\es@a8\es@a9\es@a0}
 
+\bbl@ifshorthand{~}{}%
+  {\PassOptionsToPackage{es-notilde}{babel}}
 \es@ifoption{notilde}{}{\es@set@shorthand{~}}
 \def\deactivatetilden{%
   \expandafter\let\csname spanish@sh@\string~@n@\endcsname\relax
@@ -2367,8 +2383,8 @@ previous behavior and macros for backwards compatibility.
        \shorthandoff{<>}%
        \let\es@quoting\deactivatequoting}}{}}
 
-\es@declarealt{<<}{"`}{\begin{quoting}}
-\es@declarealt{>>}{"'}{\end{quoting}}
+\es@declarealt{<<}{"`}{\es@babeltexpdf{\begin{quoting}}{\guillemotleft}}
+\es@declarealt{>>}{"'}{\es@babeltexpdf{\end{quoting}}{\guillemotright}}
 %    \end{macrocode}
 %
 % Acute accent shorthands are stored in a macro.  If |activeacute| was
@@ -2495,7 +2511,8 @@ previous behavior and macros for backwards compatibility.
   {\def\es@romandef{%
      \def\esromanindex##1##2{##1{\es@scroman{##2}}}%
      \def\@roman##1{\es@roman{\number##1}}%
-     \def\es@roman##1{\es@scroman{\romannumeral##1}}%
+     \def\es@roman##1{%
+       \es@babeltexpdf{\es@scroman{\romannumeral##1}}{\@Roman{##1}}}%
      \DeclareRobustCommand\es@scroman{\es@xlsc\uppercase\@firstofone}}}
 \es@optlayout{lcroman}{\es@romandef}
 \newcommand\spanishlcroman{\def\@roman##1{\romannumeral##1}}
